@@ -152,7 +152,7 @@ h1 small{display:block;font-size:12px;color:var(--accent);letter-spacing:.2em;ma
     <p class="lead">100m の世界記録は、1968年から何度も書き換えられてきた。その年の記録の「ゴースト」と同じスタートラインに立ち、先にゴールすれば、歴史はあなたのタイムに書き換わる。</p>
     <div class="cont" id="contBox"></div>
     <div class="rec-list" id="recList"></div>
-    <p class="note">記録は年と公式タイムだけを使っています。勝つと次の年の記録に挑めます。<br>記録と走者はこの端末のブラウザに残るので、閉じても続きから挑めます。</p>
+    <p class="note">記録は年と公式タイムだけを使っています。勝つと次の年の記録に挑めます。<br>記録と走者はこの端末のブラウザに残るので、閉じても続きから挑めます。<br>レースの結果（タイム・走者の素質・記録表の名前）は、遊ばれ方の集計のために送信されます。</p>
     <div class="title-foot" id="titleFoot">
       <button class="btn danger" id="resetBtn">記録を削除する</button>
       <div id="resetMsg"></div>
@@ -823,6 +823,8 @@ function showResult(){
     save.target = won && i+1<RECORDS.length ? RECORDS[i+1].id : rec.id; }
   persist();
   lastResult = {rec, t, won, react:R.react, topV:R.topV, stumbles:R.stumbles, falseStart:R.falseStart, runner:{...runner}};
+  // 集計用にレースの結果を送る。初めて勝ったときは、名前を決めてから送る
+  if(won && !save.name) pendingPlay = lastResult; else sendPlay(lastResult);
   $('resTime').textContent = t.toFixed(2);
   const diff = t - rec.time;
   $('resVerdict').className = 'verdict ' + (won?'win':'lose');
@@ -886,6 +888,7 @@ $('nameFirstBtn').onclick = ()=>{
   const n = cleanName($('nameFirst').value);
   if(!n){ $('nameFirst').focus(); $('nameFirstMsg').textContent='名前を1文字以上入れてください'; return; }
   setName(n); $('nameModal').classList.remove('on'); renderRewrite();
+  if(pendingPlay){ sendPlay(pendingPlay); pendingPlay = null; }
 };
 $('nameFirst').addEventListener('keydown', e=>{ if(e.key==='Enter') $('nameFirstBtn').click(); });
 // 2回目以降: 入っている名前を変えたいときだけ書き換える
@@ -1149,6 +1152,46 @@ window.__sim = function(grades, tapsPerSec, react=.18){
   }
   return +t.toFixed(2);
 };
+
+// ===== レースの結果の送信（Firestore の rewrite100_plays。管理画面 ../rewrite100-admin/ で集計する）
+// Web 用の firebaseConfig は公開する前提の値。書き込める項目と値の範囲は Firestore のルールで制限している
+const firebaseConfig = {
+  apiKey: 'AIzaSyBevrf2tXP4bWXphJNCtq9wogyuY7HYi80',
+  authDomain: 'rewrite100-19911.firebaseapp.com',
+  projectId: 'rewrite100-19911',
+  storageBucket: 'rewrite100-19911.firebasestorage.app',
+  messagingSenderId: '438530092228',
+  appId: '1:438530092228:web:f52e3edd8c469699e5ed91',
+};
+let fbAdd = null, pendingPlay = null;
+if(firebaseConfig.apiKey && firebaseConfig.projectId && !/[?&]nolog\b/.test(location.search)){
+  Promise.all([import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'), import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')])
+    .then(([a,f])=>{ const col=f.collection(f.getFirestore(a.initializeApp(firebaseConfig)), 'rewrite100_plays');
+      fbAdd = d=>f.addDoc(col, {...d, timestamp:f.serverTimestamp()}); })
+    .catch(e=>console.warn('集計の送信を準備できませんでした', e));
+}
+// 名前とは別の、端末ごとの匿名の番号（何人が遊んだかを数えるため。記録を削除しても変わらない）
+function playerId(){
+  try{
+    let id = localStorage.getItem('rewrite100_pid');
+    if(!id || !/^[A-Za-z0-9]{12}$/.test(id)){
+      const cs='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789', b=crypto.getRandomValues(new Uint8Array(12));
+      id = Array.from(b, x=>cs[x%cs.length]).join(''); localStorage.setItem('rewrite100_pid', id);
+    }
+    return id;
+  }catch(e){ return 'unknown00000'; }
+}
+function sendPlay(r){
+  if(!fbAdd || !r) return;
+  const g = r.runner;
+  const d = {
+    pid: playerId(), rec: r.rec.id, time: r.t, won: !!r.won, // 丸めると記録ちょうどの境目で勝ち負けとずれるので、そのまま送る
+    start: g.start, accel: g.accel, top: g.top, stam: g.stam, rtype: runnerType(g).name.slice(0,12),
+    react: r.react===null ? -1 : Math.round(Math.min(r.react, 9)*1000)/1000,
+    stumbles: Math.min(999, r.stumbles|0), falseStarts: Math.min(99, r.falseStart|0), name: cleanName(save.name||''),
+  };
+  try{ fbAdd(d).catch(e=>console.warn('結果を送れませんでした', e.code||e)); }catch(e){}
+}
 
 renderTitle();
 prepareCrowd();
