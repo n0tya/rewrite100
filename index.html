@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Rewrite 100（リライト100）｜歴史を書き換える100m</title>
+<meta name="description" content="100m 世界記録のゴーストと並んで走り、先にゴールすれば記録表があなたの名前に書き換わる。1968年の9.95から2009年の9.58まで、13の記録に挑むランニングゲーム。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://n0tya.github.io/rewrite100/">
+<meta property="og:title" content="Rewrite 100 ｜ 歴史を書き換える100m">
+<meta property="og:description" content="100m 世界記録のゴーストと並んで走れ。先にゴールすれば、記録表があなたの名前に書き換わる。">
+<meta property="og:site_name" content="INDIE SHORTS">
+<meta property="og:image" content="https://n0tya.github.io/rewrite100/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rewrite 100 歴史を書き換える100m">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d1117">
+<style>
+:root{
+  --bg:#0d1117; --panel:#161c26; --line:#2a3342; --text:#eef2f7; --sub:#9aa7b8;
+  --accent:#ff6a3d; --gold:#ffd166; --good:#4ade80; --bad:#f87171; --ghost:#7dd3fc;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+  font-family:"Hiragino Sans","Noto Sans JP","Yu Gothic UI",system-ui,sans-serif;overflow:hidden;
+  user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#app{position:fixed;inset:0;max-width:520px;margin:0 auto}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;padding:20px 16px}
+.screen.on{display:flex}
+h1{font-size:26px;margin:8px 0 4px;letter-spacing:.04em}
+h1 small{display:block;font-size:12px;color:var(--accent);letter-spacing:.2em;margin-bottom:6px}
+.lead{color:var(--sub);font-size:13px;line-height:1.7;margin:0 0 14px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;
+  background:var(--accent);color:#1a0d07;cursor:pointer;font-family:inherit}
+.btn.sub{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:8px}.row .btn{flex:1}
+.rec-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.rec{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);
+  border-radius:10px;padding:10px 12px;cursor:pointer;text-align:left;color:var(--text);font-family:inherit;font-size:14px}
+.rec .yr{font-weight:700;width:86px}
+.rec .tm{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;color:var(--ghost)}
+.rec .st{margin-left:auto;font-size:12px;color:var(--sub);text-align:right}
+.rec.won .st{color:var(--good)}
+.rec.locked{opacity:.35;cursor:default}
+.rec.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.reels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 6px}
+.reel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center}
+.reel .lb{font-size:11px;color:var(--sub)}
+.reel .gr{font-size:40px;font-weight:900;line-height:1.2;font-variant-numeric:tabular-nums}
+.reel .ds{font-size:10px;color:var(--sub);min-height:28px;line-height:1.35}
+.g-S{color:var(--gold)}.g-A{color:#fb923c}.g-B{color:var(--text)}.g-C{color:#94a3b8}.g-D{color:#64748b}
+.target{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;font-size:14px}
+.target b{color:var(--ghost);font-size:20px}
+.note{font-size:11px;color:var(--sub);line-height:1.6;margin-top:10px}
+/* race */
+#race{padding:0}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;left:0;right:0;top:0;padding:10px 12px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none}
+.hud .tm{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;text-shadow:0 2px 6px #000}
+.hud .sp{font-size:13px;color:#fff;text-align:right;text-shadow:0 1px 4px #000}
+#call{position:absolute;left:0;right:0;top:34%;text-align:center;font-size:40px;font-weight:900;
+  text-shadow:0 3px 12px #000;pointer-events:none}
+.pads{position:absolute;left:0;right:0;bottom:0;height:34%;display:flex;gap:6px;padding:8px}
+.pad{flex:1;border-radius:16px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
+  color:#fff;font-size:22px;font-weight:900;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.pad.next{border-color:var(--accent);background:rgba(255,106,61,.22)}
+.pad.hit{background:rgba(255,255,255,.35)}
+#race.slowmo .pads,#race.slowmo .keyhint{opacity:0;transition:opacity .2s}
+#race.slowmo .hud .sp{display:none}
+#race.slowmo #call{top:11%;font-size:30px}
+/* 実況 */
+#comm{position:absolute;left:50%;top:76px;transform:translateX(-50%);max-width:92%;background:rgba(0,0,0,.6);border-left:3px solid var(--accent);
+  padding:6px 12px;border-radius:6px;font-size:15px;font-weight:700;line-height:1.4;width:max-content;text-align:center;pointer-events:none;opacity:0;transition:opacity .25s}
+#comm.on{opacity:1}
+#race.slowmo #comm{opacity:0}
+.keyhint{position:absolute;left:0;right:0;bottom:35%;text-align:center;font-size:11px;color:#fff;opacity:.7;pointer-events:none;text-shadow:0 1px 3px #000}
+/* result */
+.big{font-size:56px;font-weight:900;font-variant-numeric:tabular-nums;text-align:center;margin:6px 0 0}
+.verdict{text-align:center;font-size:20px;font-weight:800;margin:4px 0 10px}
+.verdict.win{color:var(--gold)}.verdict.lose{color:var(--sub)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.stat .k{font-size:11px;color:var(--sub)}.stat .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.hist{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:12px;font-size:13px}
+.hist h3{font-size:12px;color:var(--sub);margin:4px 0 6px;font-weight:600}
+.hist .h{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.hist .h:last-child{border:0}
+.hist .h.me{color:var(--gold);font-weight:800}
+.hist .h.beaten{color:var(--sub);text-decoration:line-through}
+/* 歴史改変: 古い記録に線が引かれ、自分のタイムが刷り込まれる */
+.hist .h.rewrite{position:relative;color:var(--text);animation:fadeSub .3s 1.0s forwards}
+.hist .h.rewrite::after{content:"";position:absolute;left:0;top:50%;height:2px;width:0;background:var(--bad);animation:strike .45s .55s cubic-bezier(.6,0,.3,1) forwards}
+.hist .h.stamp{opacity:0;animation:stamp .35s 1.15s cubic-bezier(.2,1.6,.4,1) forwards;
+  background:linear-gradient(90deg,rgba(255,209,102,.18),transparent);border-radius:6px;padding-left:6px;padding-right:6px}
+.hist .h.stamp .new{display:inline-block;font-size:10px;background:var(--gold);color:#1a1205;border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
+@keyframes strike{to{width:100%}}
+@keyframes fadeSub{to{color:var(--sub)}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.7) rotate(-4deg)}100%{opacity:1;transform:none}}
+.namebox{display:none;align-items:center;gap:6px;margin:0 0 10px;font-size:12px;color:var(--sub);flex-wrap:wrap}
+.namebox input{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--line);color:var(--text);
+  border-radius:8px;padding:8px 10px;font-size:16px;font-family:inherit;min-height:44px}
+.namebox button{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:8px 12px;font-size:14px;font-family:inherit;cursor:pointer;min-height:44px;min-width:64px}
+/* 一時停止 */
+.pausebtn{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.3);
+  background:rgba(0,0,0,.45);cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;gap:5px;padding:0}
+.pausebtn i{display:block;width:5px;height:16px;border-radius:1px;background:#fff}
+#race .hud{padding-right:62px}
+.vol{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-size:14px}
+.vol label{width:56px;flex:none}
+.vol input{flex:1;height:44px;accent-color:var(--accent);margin:0}
+.vol output{width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--sub);font-size:13px}
+.modal-box.plain{border-color:var(--line);animation:none}
+.modal-box .stack{margin-top:6px}
+/* 続きから・記録の削除 */
+.cont{margin:0 0 12px}
+.cont .btn small{display:block;font-size:12px;font-weight:600;opacity:.8;margin-top:2px}
+.btn.danger{background:transparent;color:var(--bad);border:1px solid rgba(248,113,113,.45)}
+.title-foot{margin-top:auto;padding-top:18px}
+#resetMsg{font-size:12px;color:var(--good);text-align:center;margin-top:6px;min-height:1em}
+#nameSaved{color:var(--good);width:100%;text-align:right;min-height:0}
+#nameSaved:empty{display:none}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal.on{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--gold);border-radius:16px;padding:20px 16px;width:100%;max-width:380px;
+  animation:stamp .35s cubic-bezier(.2,1.6,.4,1)}
+.modal-k{color:var(--gold);font-size:12px;font-weight:700;letter-spacing:.1em;margin-bottom:6px}
+.modal-t{font-size:20px;font-weight:800;line-height:1.5;margin-bottom:14px}
+.modal-box input{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font-size:18px;font-family:inherit}
+.modal-msg{font-size:11px;color:var(--sub);margin:6px 0 14px}
+.paper-wrap{display:none;margin-bottom:12px}
+.paper-wrap.on{display:block;opacity:0;animation:paperIn .6s 1.9s ease-out forwards}
+.paper-wrap.on.quick{animation-delay:.2s}
+.paper-wrap img{width:100%;display:block;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.paper-lb{font-size:12px;color:var(--gold);margin:0 0 6px;font-weight:700;letter-spacing:.1em}
+@keyframes paperIn{0%{opacity:0;transform:translateY(24px) rotate(-3deg) scale(.92)}100%{opacity:1;transform:rotate(-.6deg)}}
+@media (prefers-reduced-motion: reduce){.hist .h.rewrite,.hist .h.rewrite::after,.hist .h.stamp,.paper-wrap.on{animation-duration:.01s;animation-delay:0s}}
+.stack{display:flex;flex-direction:column;gap:8px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- タイトル: 記録を選ぶ -->
+  <section class="screen on" id="title">
+    <h1><small>歴史を書き換える100m</small>Rewrite 100</h1>
+    <p class="lead">100m の世界記録は、1968年から何度も書き換えられてきた。その年の記録の「ゴースト」と同じスタートラインに立ち、先にゴールすれば、歴史はあなたのタイムに書き換わる。</p>
+    <div class="cont" id="contBox"></div>
+    <div class="rec-list" id="recList"></div>
+    <p class="note">記録は年と公式タイムだけを使っています。勝つと次の年の記録に挑めます。<br>記録と走者はこの端末のブラウザに残るので、閉じても続きから挑めます。</p>
+    <div class="title-foot" id="titleFoot">
+      <button class="btn danger" id="resetBtn">記録を削除する</button>
+      <div id="resetMsg"></div>
+    </div>
+    <div class="modal" id="resetModal">
+      <div class="modal-box plain">
+        <div class="modal-t">記録を削除しますか？</div>
+        <p class="lead">書き換えた記録・ベストタイム・今の走者が消えて、1968年からやり直しになります。元には戻せません。<br>記録表の名前と音量の設定は残ります。</p>
+        <div class="stack">
+          <button class="btn danger" id="resetYes">削除する</button>
+          <button class="btn sub" id="resetNo">やめる</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- スロット -->
+  <section class="screen" id="slot">
+    <h1><small>YOUR RUNNER</small>走者を決める</h1>
+    <div class="target" id="slotTarget"></div>
+    <div class="reels" id="reels"></div>
+    <p class="lead" id="slotMsg" style="text-align:center;margin:6px 0 12px">スロットで走者の素質が決まります。</p>
+    <div class="stack">
+      <button class="btn sub" id="spinBtn">スロットを回す</button>
+      <button class="btn" id="goBtn" disabled>この走者で挑む</button>
+      <button class="btn sub" id="backBtn">記録を選び直す</button>
+    </div>
+    <p class="note">回し直しは何度でも。弱い走者で勝つほど、自慢になります。<br>走り方: 号砲（パン）が鳴ったら、左右を交互にタップ。PC は ← → か F J キー。同じ側を続けて押すとつまずきます。号砲の前に押すとフライング。</p>
+  </section>
+
+  <!-- レース -->
+  <section class="screen" id="race">
+    <canvas id="cv"></canvas>
+    <div class="hud"><div class="tm" id="hudTime">0.00</div><div class="sp" id="hudSpeed"></div></div>
+    <div id="call"></div>
+    <div id="comm"></div>
+    <div class="keyhint">← → / F J でも走れます</div>
+    <div class="pads">
+      <button class="pad" id="padL">左</button>
+      <button class="pad" id="padR">右</button>
+    </div>
+    <button class="pausebtn" id="pauseBtn" aria-label="一時停止"><i></i><i></i></button>
+    <div class="modal" id="pauseModal">
+      <div class="modal-box plain">
+        <div class="modal-t">一時停止</div>
+        <div class="vol"><label for="volSe">効果音</label><input type="range" id="volSe" min="0" max="100" step="10"><output id="volSeV"></output></div>
+        <div class="vol"><label for="volCrowd">歓声</label><input type="range" id="volCrowd" min="0" max="100" step="10"><output id="volCrowdV"></output></div>
+        <div class="stack">
+          <button class="btn" id="resumeBtn">続ける</button>
+          <button class="btn sub" id="restartBtn">最初から走り直す</button>
+          <button class="btn sub" id="quitBtn">トップ（記録の一覧）に戻る</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section class="screen" id="result">
+    <div class="big" id="resTime">0.00</div>
+    <div class="verdict" id="resVerdict"></div>
+    <div class="namebox" id="nameBox">
+      <label for="nameInput">記録表の名前</label>
+      <input id="nameInput" maxlength="12" autocomplete="nickname" enterkeyhint="done">
+      <button id="nameSave">変更</button>
+      <span id="nameSaved"></span>
+    </div>
+    <div class="hist" id="resHist"></div>
+    <div class="paper-wrap" id="paperWrap">
+      <div class="paper-lb" id="paperLb">号外が出ました</div>
+      <img id="paperImg" alt="号外の紙面">
+    </div>
+    <div class="stats" id="resStats"></div>
+    <div class="stack">
+      <button class="btn" id="nextBtn">次の記録へ</button>
+      <div class="row">
+        <button class="btn sub" id="retryBtn">同じ走者で再挑戦</button>
+        <button class="btn sub" id="reslotBtn">走者を選び直す</button>
+      </div>
+      <button class="btn sub" id="paperBtn">号外を画像で保存</button>
+      <button class="btn sub" id="shareBtn">X でシェア</button>
+      <button class="btn sub" id="toTitleBtn">記録の一覧へ</button>
+    </div>
+    <div class="modal" id="nameModal">
+      <div class="modal-box">
+        <div class="modal-k">はじめて歴史が変わりました</div>
+        <div class="modal-t">記録表に刻む名前を<br>決めてください</div>
+        <input id="nameFirst" maxlength="12" placeholder="例: ハヤテ" autocomplete="nickname" enterkeyhint="done">
+        <div class="modal-msg" id="nameFirstMsg">12文字まで。あとから結果画面で変えられます。</div>
+        <button class="btn" id="nameFirstBtn">この名前で刻む</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+'use strict';
+// ===== データ: 男子100m 世界記録（電動計時以降）。年とタイムのみ（2026-11-15 に公認記録の推移と照合済み。取り消された記録は含めない）
+const RECORDS = [
+  {id:'1968',    label:'1968年',     time:9.95},
+  {id:'1983',    label:'1983年',     time:9.93},
+  {id:'1988',    label:'1988年',     time:9.92},
+  {id:'1991a',   label:'1991年6月',  time:9.90},
+  {id:'1991b',   label:'1991年8月',  time:9.86},
+  {id:'1994',    label:'1994年',     time:9.85},
+  {id:'1996',    label:'1996年',     time:9.84},
+  {id:'1999',    label:'1999年',     time:9.79},
+  {id:'2005',    label:'2005年',     time:9.77},
+  {id:'2007',    label:'2007年',     time:9.74},
+  {id:'2008a',   label:'2008年5月',  time:9.72},
+  {id:'2008b',   label:'2008年8月',  time:9.69},
+  {id:'2009',    label:'2009年',     time:9.58},
+];
+const SHARE_URL = 'https://n0tya.github.io/rewrite100/';
+const GAME_NAME = 'Rewrite100';
+
+// ===== 走者の素質
+const GRADES = ['S','A','B','C','D'];
+const WEIGHTS = {S:8,A:17,B:30,C:30,D:15};
+const STATS = [
+  {key:'start', name:'スタート', desc:{S:'号砲と同時に飛び出す',A:'出足が鋭い',B:'ふつうの出足',C:'出足がもたつく',D:'立ち上がりが遅い'}},
+  {key:'accel', name:'加速',     desc:{S:'一瞬で最高速へ',A:'ぐんぐん伸びる',B:'じわじわ伸びる',C:'加速に時間がかかる',D:'なかなか乗らない'}},
+  {key:'top',   name:'最高速',   desc:{S:'人類の限界級',A:'世界のトップ級',B:'国内の決勝級',C:'まあまあ速い',D:'最高速は控えめ'}},
+  {key:'stam',  name:'粘り',     desc:{S:'最後まで落ちない',A:'終盤も伸びる',B:'終盤に少し落ちる',C:'終盤に失速',D:'60mで脚が止まる'}},
+];
+// 数値（バランス調整の対象）
+const P = {
+  start:{S:1.6,A:1.45,B:1.3,C:1.15,D:1.0},    // 号砲から1.2秒の加速倍率
+  accel:{S:1.05,A:.95,B:.85,C:.75,D:.65},      // 目標速度への近づきやすさ
+  top:{S:12.1,A:11.85,B:11.6,C:11.35,D:11.1},  // 最高速 m/s
+  stam:{S:.004,A:.008,B:.012,C:.016,D:.02},    // 5.5秒以降、1秒あたりの最高速の低下
+  stride:1.35,        // タップ毎秒 → 速度 m/s（毎秒9回で B の最高速に届く。全部 B・毎秒9回で約9.83秒）
+  window:.8,          // タップの速さを測る時間（秒）
+};
+
+// ===== 保存（端末内）
+const SAVE_KEY = 'recordghost_v1';
+let save = {best:{}, wins:{}};
+try{ const s = JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); if(s) save = Object.assign(save,s); }catch(e){}
+function persist(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){} }
+function unlockedIndex(){ let i=0; while(i<RECORDS.length && save.wins[RECORDS[i].id]) i++; return Math.min(i, RECORDS.length-1); }
+function validRunner(r){ return r && STATS.every(s=>GRADES.includes(r[s.key])); }
+function hasProgress(){ return Object.keys(save.best).length>0 || !!save.runner; }
+// 音量（記録とは別に保存。記録を削除しても残す）
+const SET_KEY = 'rewrite100_settings';
+let settings = {se:1, crowd:1};
+try{ const s = JSON.parse(localStorage.getItem(SET_KEY)||'null'); if(s) settings = Object.assign(settings,s); }catch(e){}
+function persistSettings(){ try{ localStorage.setItem(SET_KEY, JSON.stringify(settings)); }catch(e){} }
+
+// ===== 画面切り替え
+const $ = id => document.getElementById(id);
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id)); }
+
+let targetIdx = 0;
+let runner = validRunner(save.runner) ? save.runner : null; // 前回スロットで決めた走者を引き継ぐ
+
+// 続きから挑む記録: 前回選んだ記録（開いていれば）、なければまだ破っていない最初の記録
+function contIndex(){
+  const i = RECORDS.findIndex(r=>r.id===save.target);
+  return i>=0 && i<=unlockedIndex() ? i : unlockedIndex();
+}
+function renderTitle(){
+  const ul = unlockedIndex();
+  const cb = $('contBox');
+  if(hasProgress()){
+    const ci = contIndex(), r = RECORDS[ci];
+    cb.innerHTML = `<button class="btn" id="contBtn">続きから挑む<small>${r.label} ${r.time.toFixed(2)}${runner?`・${runnerType(runner).name}の走者で`:''}</small></button>`;
+    $('contBtn').onclick = ()=>{ targetIdx=ci; openSlot(); };
+  } else cb.innerHTML = '';
+  $('titleFoot').style.display = hasProgress() ? '' : 'none';
+  const box = $('recList'); box.innerHTML='';
+  RECORDS.forEach((r,i)=>{
+    const b = document.createElement('button');
+    const won = !!save.wins[r.id], locked = i>ul;
+    b.className = 'rec' + (won?' won':'') + (locked?' locked':'');
+    const best = save.best[r.id];
+    b.innerHTML = `<span class="yr">${r.label}</span><span class="tm">${r.time.toFixed(2)}</span>
+      <span class="st">${locked?'🔒 前の年を破ると開く': won?`改変済み<br>ベスト ${best.toFixed(2)}`: best?`ベスト ${best.toFixed(2)}`:'挑戦できる'}</span>`;
+    if(!locked) b.onclick = ()=>{ targetIdx=i; openSlot(); };
+    box.appendChild(b);
+  });
+}
+
+// ===== 走者の型（素質の組み合わせで決まる個性）
+const SC = {S:5,A:4,B:3,C:2,D:1};
+function runnerType(g){
+  const s=SC[g.start], a=SC[g.accel], t=SC[g.top], m=SC[g.stam], all=[s,a,t,m], sum=s+a+t+m;
+  if(Math.min(...all)>=4) return {name:'怪物', desc:'すべてが一級品。負ける理由が見当たらない'};
+  if(s>=4 && m<=2) return {name:'ロケット型', desc:'号砲と同時に突き放す。後半、脚が残っているか'};
+  if(m>=4 && s<=2) return {name:'追い込み型', desc:'出遅れても、終盤にじわじわ詰めてくる'};
+  if(t>=4 && a<=2) return {name:'大器晩成型', desc:'最高速に乗るまでが勝負。乗れば速い'};
+  if(a>=4 && t<=2) return {name:'瞬発型', desc:'立ち上がりは鋭いが、天井は低め'};
+  if(sum<=8) return {name:'雑草型', desc:'素質は控えめ。勝てたら大金星'};
+  if(Math.max(...all)-Math.min(...all)<=1) return {name:'万能型', desc:'クセのない走り。地力で勝負'};
+  const best = STATS.reduce((b,x)=>SC[g[x.key]]>SC[g[b.key]]?x:b);
+  return {name:`${best.name}自慢`, desc:`${best.name}を武器に、記録へ挑む`};
+}
+function showType(){
+  if(!runner){ $('slotMsg').textContent='スロットで走者の素質が決まります。'; return; }
+  const ty = runnerType(runner);
+  $('slotMsg').innerHTML = `<b style="color:var(--gold);font-size:18px">${ty.name}</b><br>${ty.desc}`;
+}
+
+// ===== スロット
+function rollGrade(){ let n=Math.random()*100; for(const g of GRADES){ n-=WEIGHTS[g]; if(n<0) return g; } return 'D'; }
+function renderReels(r, spinning){
+  $('reels').innerHTML = STATS.map(s=>{
+    const g = r ? r[s.key] : '?';
+    return `<div class="reel"><div class="lb">${s.name}</div><div class="gr ${r?'g-'+g:''}">${g}</div>
+      <div class="ds">${r&&!spinning? s.desc[g] : ''}</div></div>`;
+  }).join('');
+}
+function openSlot(){
+  const r = RECORDS[targetIdx];
+  $('slotTarget').innerHTML = `挑む記録 <b>${r.label}　${r.time.toFixed(2)}</b><br><span style="color:var(--sub);font-size:12px">この年の世界記録のゴーストと並んで走ります</span>`;
+  renderReels(runner,false); showType();
+  $('goBtn').disabled = !runner;
+  save.target = r.id; persist();
+  show('slot');
+}
+let spinning=false;
+$('spinBtn').onclick = ()=>{
+  if(spinning) return; spinning=true; $('goBtn').disabled=true; $('spinBtn').disabled=true; $('slotMsg').textContent='…';
+  const final = {}; STATS.forEach(s=>final[s.key]=rollGrade());
+  const stopAt = STATS.map((_,i)=>350+i*250); const t0=performance.now();
+  (function tick(){
+    const el = performance.now()-t0; const cur={};
+    STATS.forEach((s,i)=>cur[s.key]= el>=stopAt[i] ? final[s.key] : GRADES[Math.floor(Math.random()*5)]);
+    renderReels(cur,true);
+    if(el < stopAt[stopAt.length-1]) requestAnimationFrame(tick);
+    else { runner=final; save.runner={...final}; persist(); renderReels(runner,false); showType(); spinning=false; $('goBtn').disabled=false; $('spinBtn').disabled=false; }
+  })();
+};
+$('goBtn').onclick = ()=> startRace();
+$('backBtn').onclick = ()=>{ renderTitle(); show('title'); };
+
+// ===== ゴースト（記録タイムから速度の曲線を作る）
+const G_TAU = 1.25, G_REACT = .15;
+function ghostDist(T, t){
+  const vmax = 100 / ((T-G_REACT) - G_TAU*(1-Math.exp(-(T-G_REACT)/G_TAU)));
+  const tt = Math.max(0, t-G_REACT);
+  return vmax*(tt - G_TAU*(1-Math.exp(-tt/G_TAU)));
+}
+
+// ===== レース
+const cv = $('cv'), cx = cv.getContext('2d');
+let W=0,H=0,DPR=1;
+function resize(){ DPR=Math.min(2,window.devicePixelRatio||1); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; cx.setTransform(DPR,0,0,DPR,0,0); }
+window.addEventListener('resize', resize);
+
+let R = null; // レースの状態
+function startRace(){
+  const rec = RECORDS[targetIdx];
+  // ゴーストは挑む記録と、その前後（あれば）
+  const ghosts = [];
+  const pick = [targetIdx-1, targetIdx, targetIdx+1].filter(i=>i>=0 && i<RECORDS.length);
+  const lanes = {[targetIdx-1]:2,[targetIdx]:4,[targetIdx+1]:5};
+  pick.forEach(i=>ghosts.push({rec:RECORDS[i], lane:lanes[i], main:i===targetIdx, d:0, fin:null}));
+  R = {phase:'marks', phaseT:0, setDur:1.2+Math.random()*1.2, t:0, rec, ghosts,
+       d:0, v:0, taps:[], lastFoot:null, react:null, fin:null, topV:0, stumbles:0, falseStart:0,
+       stepPhase:0, lane:3, flash:0, endT:0, side:false};
+  crowdStop(.2); crowdStart(); $('comm').classList.remove('on');
+  $('race').classList.remove('slowmo');
+  show('race'); resize(); setCall('位置について'); updatePads();
+  last = performance.now(); requestAnimationFrame(loop);
+}
+function setCall(s){ $('call').textContent = s; }
+
+function tap(foot){
+  if(!R || paused) return;
+  const pad = foot==='L'?$('padL'):$('padR'); pad.classList.add('hit'); setTimeout(()=>pad.classList.remove('hit'),80);
+  if(R.phase==='marks' || R.phase==='set'){
+    if(R.phase==='set'){ // フライング
+      R.falseStart++; R.phase='marks'; R.phaseT=0; R.setDur=1.2+Math.random()*1.2;
+      setCall('フライング！ やり直し'); beep(180,.25,'sawtooth');
+    }
+    return;
+  }
+  if(R.phase!=='run' || R.side) return;
+  if(R.react===null) R.react = R.t;
+  if(R.lastFoot===foot){ R.v*=0.96; R.stumbles++; R.flash=.25; beep(120,.06,'square'); say('つまずいた！ 立て直せるか！', 'stumble'+Math.floor(R.t/1.5)); }
+  else { R.taps.push(R.t); R.lastFoot=foot; R.stepPhase+=Math.PI; step(); }
+  updatePads();
+}
+function updatePads(){
+  const n = R && R.lastFoot ? (R.lastFoot==='L'?'R':'L') : null;
+  $('padL').classList.toggle('next', n==='L'); $('padR').classList.toggle('next', n==='R');
+}
+['padL','padR'].forEach(id=>{
+  const el=$(id), f=id==='padL'?'L':'R';
+  el.addEventListener('pointerdown', e=>{ e.preventDefault(); tap(f); });
+});
+window.addEventListener('keydown', e=>{
+  if(e.repeat) return;
+  if(!$('race').classList.contains('on')) return;
+  const k=e.key.toLowerCase();
+  if(k==='escape'||k==='p'){ e.preventDefault(); setPaused(!paused); return; }
+  if(paused) return;
+  if(k==='arrowleft'||k==='f'||k==='a') { e.preventDefault(); tap('L'); }
+  if(k==='arrowright'||k==='j'||k==='l') { e.preventDefault(); tap('R'); }
+});
+
+let last=0;
+function loop(now){
+  if(!R) return;
+  const real = Math.min(.05,(now-last)/1000); last=now;
+  if(!paused){ update(real*timeScale(), real); crowdUpdate(); }
+  R && (R.side ? drawSide() : draw());
+  if(R && R.phase!=='done') requestAnimationFrame(loop);
+}
+// ===== 一時停止（右上のボタン、Esc / P キー、アプリを切り替えたとき）
+let paused = false;
+function setPaused(on){
+  if(on && (!R || R.phase==='done')) return;
+  paused = on;
+  $('pauseModal').classList.toggle('on', on);
+  const a=audio(), b=crowdOut();
+  if(a && b){ b.gain.cancelScheduledValues(a.currentTime); b.gain.setTargetAtTime(on ? 0 : settings.crowd, a.currentTime, .08); }
+  if(on) renderVol();
+}
+function leaveRace(){
+  setPaused(false); crowdStop(.3); R=null; $('comm').classList.remove('on'); $('race').classList.remove('slowmo');
+}
+$('pauseBtn').addEventListener('click', ()=>setPaused(true));
+$('resumeBtn').onclick = ()=>setPaused(false);
+$('restartBtn').onclick = ()=>{ leaveRace(); startRace(); };
+$('quitBtn').onclick = ()=>{ leaveRace(); renderTitle(); show('title'); };
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden && R && R.phase!=='done' && !paused) setPaused(true); });
+// 音量
+function renderVol(){
+  $('volSe').value = Math.round(settings.se*100); $('volSeV').textContent = Math.round(settings.se*100)+'%';
+  $('volCrowd').value = Math.round(settings.crowd*100); $('volCrowdV').textContent = Math.round(settings.crowd*100)+'%';
+}
+$('volSe').addEventListener('input', e=>{ settings.se = e.target.value/100; persistSettings(); renderVol();
+  const a=audio(), b=seOut(); if(a && b) b.gain.setValueAtTime(settings.se, a.currentTime); });
+$('volSe').addEventListener('change', ()=>step()); // 離したときに足音で大きさを確かめる
+$('volCrowd').addEventListener('input', e=>{ settings.crowd = e.target.value/100; persistSettings(); renderVol(); });
+// 記録の削除
+$('resetBtn').onclick = ()=>$('resetModal').classList.add('on');
+$('resetNo').onclick = ()=>$('resetModal').classList.remove('on');
+$('resetYes').onclick = ()=>{
+  save = {best:{}, wins:{}, ...(save.name ? {name:save.name} : {})};
+  runner = null; targetIdx = 0; persist();
+  $('resetModal').classList.remove('on'); renderTitle();
+  $('resetMsg').textContent = '';
+  $('title').scrollTop = 0;
+};
+// ===== ゴール前のスロー（残り SLOW_M メートルから、横からの映像に切り替え）
+const SLOW_M = 2, SLOW_RATE = .12, SLOW_HOLD = .3; // スローの速さ（実時間の何倍）、ゴール後にスローを続ける時間（レース内の秒）
+function timeScale(){
+  if(!R || !R.side) return 1;
+  if(R.phase==='run') return SLOW_RATE;
+  if(R.endT < SLOW_HOLD) return SLOW_RATE;
+  return Math.min(1, SLOW_RATE + (R.endT-SLOW_HOLD)*2); // だんだん普通の速さに戻す
+}
+function update(dt, real){
+  R.phaseT += dt; R.flash=Math.max(0,R.flash-real);
+  if(R.phase==='run' && !R.side && R.d >= 100-SLOW_M){
+    R.side = true; setCall(''); $('race').classList.add('slowmo'); slowSound();
+  }
+  if(R.phase==='marks' && R.phaseT>1.3){ R.phase='set'; R.phaseT=0; setCall('用意'); }
+  else if(R.phase==='set' && R.phaseT>R.setDur){ R.phase='run'; R.phaseT=0; setCall('パン！'); gun(); }
+  if(R.phase!=='run' && R.phase!=='after') return;
+  R.t += dt;
+  if(R.phase==='run' && R.t>.6) setCall('');
+  if(R.phase==='run' && !R.side) commentary();
+  // ゴースト
+  R.ghosts.forEach(g=>{ g.d = ghostDist(g.rec.time, R.t); if(g.fin===null && g.d>=100) g.fin=g.rec.time; });
+  // 自分
+  const st = runner;
+  if(R.phase==='run'){
+    const win = Math.min(P.window, Math.max(.3,R.t));
+    R.taps = R.taps.filter(x=>R.t-x<=P.window);
+    const cad = R.taps.length/win;
+    let vTop = P.top[st.top];
+    if(R.t>5.5) vTop *= (1 - P.stam[st.stam]*(R.t-5.5));
+    const want = Math.min(vTop, cad*P.stride);
+    if(R.side){ /* スロー中は勢いのまま（タップは効かない） */ }
+    else if(want>R.v){
+      const boost = (R.react!==null && R.t-R.react<1.2) ? P.start[st.start] : 1;
+      R.v += (want-R.v)*P.accel[st.accel]*boost*dt;
+    } else R.v += (want-R.v)*.9*dt;
+    R.topV = Math.max(R.topV,R.v);
+    R.d += R.v*dt;
+    if(R.d>=100){
+      // ゴール線をまたいだ瞬間で補間
+      const over=(R.d-100)/Math.max(R.v,.1); R.fin = R.t-over; R.phase='after'; R.endT=0;
+      setCall(R.fin < R.rec.time ? '歴史が変わった！' : `あと ${Math.max(.01, R.fin-R.rec.time).toFixed(2)} 秒…`); finishSound(R.fin < R.rec.time);
+    }
+  } else { // ゴール後は減速
+    R.v = Math.max(2, R.v - 4*dt); R.d += R.v*dt; R.endT+=dt;
+    if(R.endT>1.4){ R.phase='done'; $('race').classList.remove('slowmo'); showResult(); }
+  }
+  R.stepPhase += dt*R.v*0.9;
+  $('hudTime').textContent = (R.fin ?? R.t).toFixed(2);
+  $('hudSpeed').innerHTML = `${(R.v*3.6).toFixed(1)} km/h<br>${Math.min(100,R.d).toFixed(0)} m`;
+}
+
+// ===== 擬似3D 描画（走者の後ろ、少し上から）
+const LANE_W = 1.22, LANES = 8, CAM_BACK = 6.5, CAM_H = 2.6;
+function proj(x, y, z){ // x: 横(m) y: 高さ(m) z: カメラからの奥行き(m)
+  const f = Math.min(H*0.62, W*1.5), hz = H*0.3;
+  return {x: W/2 + f*x/z, y: hz + f*(CAM_H-y)/z, s: f/z};
+}
+function laneX(l){ return (l - R.lane)*LANE_W; } // 自分のレーン中心を 0 に
+function draw(){
+  const camD = R.d - CAM_BACK;
+  // 空と観客席
+  const sky = cx.createLinearGradient(0,0,0,H*.4); sky.addColorStop(0,'#0b1b33'); sky.addColorStop(1,'#29466e');
+  cx.fillStyle=sky; cx.fillRect(0,0,W,H);
+  const hz = H*0.3;
+  cx.fillStyle='#1d2433'; cx.fillRect(0,hz-H*.09,W,H*.09);
+  // 観客（流れる点）
+  for(let i=0;i<90;i++){
+    const xx = ((i*53.7 - camD*6) % W + W) % W, yy = hz-H*.085 + (i*17%40)/40*H*.075;
+    cx.fillStyle = ['#e2e8f0','#f87171','#fbbf24','#60a5fa','#a78bfa'][i%5]; cx.globalAlpha=.55;
+    cx.fillRect(xx,yy,3,3);
+  }
+  cx.globalAlpha=1;
+  // 芝
+  cx.fillStyle='#1f5c33'; cx.fillRect(0,hz,W,H-hz);
+  // トラック
+  const near=.6, far=160;
+  const xl = laneX(0)-LANE_W*.5-0.3, xr = laneX(LANES-1)+LANE_W*.5+0.3;
+  const a=proj(xl,0,near), b=proj(xr,0,near), c=proj(xr,0,far), d=proj(xl,0,far);
+  cx.fillStyle='#b5482f'; cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y); cx.lineTo(c.x,c.y); cx.lineTo(d.x,d.y); cx.fill();
+  // 10m ごとの帯
+  for(let m=0;m<=110;m+=10){
+    const z = m - camD; if(z<near||z>far) continue;
+    const p1=proj(xl,0,z), p2=proj(xr,0,z);
+    cx.strokeStyle = m===100 ? '#ffffff' : 'rgba(255,255,255,.18)'; cx.lineWidth = m===100? Math.max(2,p1.s*.12) : 1;
+    cx.beginPath(); cx.moveTo(p1.x,p1.y); cx.lineTo(p2.x,p2.y); cx.stroke();
+    if(m===100){ // ゴールの柱
+      [xl-.3,xr+.3].forEach(px=>{ const q0=proj(px,0,z), q1=proj(px,2.6,z); cx.strokeStyle='#ffd166'; cx.lineWidth=Math.max(2,q0.s*.08); cx.beginPath(); cx.moveTo(q0.x,q0.y); cx.lineTo(q1.x,q1.y); cx.stroke(); });
+    }
+  }
+  // レーンの線
+  cx.strokeStyle='rgba(255,255,255,.75)'; cx.lineWidth=1.2;
+  for(let l=0;l<=LANES;l++){
+    const x = laneX(l)-LANE_W/2; const p=proj(x,0,near), q=proj(x,0,far);
+    cx.beginPath(); cx.moveTo(p.x,p.y); cx.lineTo(q.x,q.y); cx.stroke();
+  }
+  // 走者（奥から順に）
+  const list = R.ghosts.map(g=>({z:g.d-camD, x:laneX(g.lane), ghost:true, g}));
+  list.push({z:CAM_BACK, x:0, ghost:false});
+  list.sort((p,q)=>q.z-p.z);
+  list.forEach(o=>{ if(o.z<.8) return; drawRunner(o); });
+  // 後ろにいるゴーストの表示
+  R.ghosts.forEach(g=>{
+    const diff = g.d - R.d;
+    if(g.d-camD < .8 && R.phase!=='marks' && R.phase!=='set'){
+      cx.fillStyle='rgba(125,211,252,.9)'; cx.font='bold 12px sans-serif'; cx.textAlign= g.lane<R.lane?'left':'right';
+      cx.fillText(`◀ ${g.rec.label} ${diff.toFixed(1)}m`, g.lane<R.lane?8:W-8, H*.62);
+    }
+  });
+  // スピード線
+  if(R.v>9){
+    cx.strokeStyle=`rgba(255,255,255,${Math.min(.35,(R.v-9)/10)})`; cx.lineWidth=1;
+    for(let i=0;i<14;i++){
+      const ang = i/14*Math.PI*2 + (R.t*7%1); const r0=Math.min(W,H)*.45, r1=r0+40+((i*37)%30);
+      cx.beginPath(); cx.moveTo(W/2+Math.cos(ang)*r0, H*.4+Math.sin(ang)*r0*.7); cx.lineTo(W/2+Math.cos(ang)*r1, H*.4+Math.sin(ang)*r1*.7); cx.stroke();
+    }
+  }
+  // つまずきの赤
+  if(R.flash>0){ cx.fillStyle=`rgba(248,113,113,${R.flash})`; cx.fillRect(0,0,W,H); }
+  // 進み具合のバー
+  const bx=12, bw=W-24, by=56;
+  cx.fillStyle='rgba(0,0,0,.4)'; cx.fillRect(bx,by,bw,6);
+  R.ghosts.forEach(g=>{ cx.fillStyle= g.main?'#7dd3fc':'rgba(125,211,252,.45)'; cx.fillRect(bx+bw*Math.min(1,g.d/100)-2,by-3,4,12); });
+  cx.fillStyle='#ff6a3d'; cx.fillRect(bx+bw*Math.min(1,R.d/100)-3,by-5,6,16);
+}
+// ===== 実況（型と展開に合わせて、ひと言ずつ出す）
+let commTimer=null;
+function say(text, key){
+  if(!R) return; R.said = R.said || {};
+  if(key){ if(R.said[key]) return; R.said[key]=true; }
+  const el=$('comm'); el.textContent=text; el.classList.add('on');
+  clearTimeout(commTimer); commTimer=setTimeout(()=>el.classList.remove('on'), 1800);
+}
+function commentary(){
+  const main = R.ghosts.find(g=>g.main), gap = R.d - main.d, lb = main.rec.label, ty = runnerType(runner).name;
+  const gs = Math.abs(gap).toFixed(1);
+  if(R.react!==null && !R.said?.react){
+    const r = R.react.toFixed(3);
+    say(R.react<.14 ? `反応 ${r}！ 完璧なスタート！` : R.react<.2 ? `反応 ${r}。いい出足！` : `反応 ${r}…出遅れた！`, 'react');
+  }
+  if(R.d>=20) say(gap>.3 ? (SC[runner.start]>=4 ? `${ty}らしい飛び出し！ ${lb}の記録より ${gs}m 前！` : `${lb}の記録より ${gs}m 前に出た！`)
+                         : gap<-.3 ? `${lb}の記録を追う！ ${gs}m 差` : `${lb}の記録と横一線！`, 'd20');
+  if(R.d>=50) say(`中間点。時速 ${(R.v*3.6).toFixed(1)}km` + (SC[runner.top]>=4 ? '、速い！' : ''), 'd50');
+  if(R.d>=70){
+    const m = SC[runner.stam];
+    say(m<=2 ? (gap>0 ? '脚が重くなってきた！ 逃げ切れるか！？' : '脚が重い！ ここが踏ん張りどころ！')
+             : m>=4 ? (gap>0 ? 'まだ伸びる！ 差が開く！' : `${ty}、ここから詰める！`)
+             : gap>0 ? `リードは ${gs}m！` : `差は ${gs}m！ 詰めろ！`, 'd70');
+  }
+  if(R.d>=86) say(Math.abs(gap)<.6 ? '並んだ！ 並んだ！' : gap>0 ? `${lb}の記録を振り切るか！` : '届くか！？', 'd86');
+}
+// 走りのフォーム: drive＝スタート直後の前傾（スタートが良いほど深い）、fat＝終盤の疲れ（粘りが低いほど崩れる）、stride＝ストライドの大きさ（最高速）
+const FATIGUE = {S:0, A:.15, B:.35, C:.65, D:1};
+function formOf(){
+  if(!R || !runner) return {drive:0, fat:0, stride:1};
+  const sinceGun = R.react!==null ? R.t-R.react : 0;
+  const drive = R.react!==null && sinceGun<1.6 && !R.side ? (1-sinceGun/1.6)*(.5+.1*SC[runner.start]) : 0;
+  const fat = R.t>5.5 ? Math.min(1,(R.t-5.5)/2.5)*FATIGUE[runner.stam] : 0;
+  return {drive, fat, stride:.85+.06*SC[runner.top]};
+}
+function drawRunner(o){
+  const base = proj(o.x,0,o.z), s = base.s; // 1m あたりの px
+  const ph = o.ghost ? o.g.d*1.35 : R.stepPhase;
+  const moving = o.ghost ? R.t>G_REACT : R.v>.3;
+  const sw = moving ? Math.sin(ph) : 0;
+  const fm = o.ghost ? {drive:0,fat:0,stride:1} : formOf();
+  cx.save();
+  cx.globalAlpha = o.ghost ? .55 : 1;
+  const col = o.ghost ? '#7dd3fc' : '#ff6a3d', skin = o.ghost ? '#bae6fd' : '#f2c6a0';
+  // 疲れると体が左右に揺れて頭が上下し、前傾だと体が沈んで頭が肩に近づく
+  const sway = Math.sin(ph*.5)*s*.08*fm.fat, bob = Math.sin(ph)*s*.05*fm.fat, sink = s*.28*fm.drive;
+  const hip = {x:base.x+sway*.4, y:base.y - s*.95 + sink*.6}, sh = {x:base.x+sway, y:base.y - s*1.45 + sink + bob};
+  cx.lineCap='round';
+  // 脚（後ろ姿なので左右に開いて上下に動く）
+  cx.strokeStyle= o.ghost? '#38bdf8':'#1e293b'; cx.lineWidth=Math.max(2,s*.13);
+  [[-1,sw],[1,-sw]].forEach(([side,k])=>{
+    const kx=hip.x+side*s*.12, ky=hip.y+s*.42 - k*s*.12, fx=hip.x+side*s*.14, fy=base.y - Math.max(0,k)*s*.35;
+    cx.beginPath(); cx.moveTo(hip.x+side*s*.08,hip.y); cx.lineTo(kx,ky); cx.lineTo(fx,fy); cx.stroke();
+  });
+  // 胴
+  cx.fillStyle=col; cx.beginPath(); cx.roundRect(sh.x-s*.2, sh.y, s*.4, hip.y-sh.y+s*.05, s*.08); cx.fill();
+  // 腕
+  cx.strokeStyle=skin; cx.lineWidth=Math.max(2,s*.09);
+  const armAmp = 1 + .8*fm.fat, armOut = 1 + .5*fm.fat; // 疲れると腕が大きく外に振れる
+  [[-1,-sw],[1,sw]].forEach(([side,k])=>{
+    cx.beginPath(); cx.moveTo(sh.x+side*s*.2, sh.y+s*.05); cx.lineTo(sh.x+side*s*.3*armOut, sh.y+s*.3 - k*s*.15*armAmp); cx.lineTo(sh.x+side*s*.24*armOut, sh.y+s*.5 - k*s*.28*armAmp); cx.stroke();
+  });
+  // 頭（前傾だと肩に埋まり、疲れるとあごが上がる）
+  cx.fillStyle= o.ghost? '#e0f2fe' : '#2b1d14'; cx.beginPath(); cx.arc(sh.x, sh.y - s*(.14 - .07*fm.drive + .03*fm.fat), s*.12, 0, Math.PI*2); cx.fill();
+  // ゼッケン
+  if(!o.ghost){ cx.fillStyle='#fff'; cx.fillRect(sh.x-s*.1, sh.y+s*.12, s*.2, s*.14); }
+  cx.restore();
+  if(o.ghost){
+    const lbl = proj(o.x, 2.2, o.z);
+    cx.fillStyle = o.g.main ? '#e0f2fe' : 'rgba(224,242,254,.6)';
+    cx.font = `bold ${Math.max(10,Math.min(16,s*.16))}px sans-serif`; cx.textAlign='center';
+    cx.fillText(`${o.g.rec.label} ${o.g.rec.time.toFixed(2)}`, lbl.x, lbl.y);
+  }
+}
+
+// ===== 横からの映像（ゴール前のスロー）
+// カメラは 1レーンより内側の芝に立ち、ゴール線付近を真横から見る。奥のレーンほど小さく、上に見える
+const SIDE_CAM_Z = 3.2, SIDE_CAM_H = 1.0;
+function sproj(d, lane, y, focus){
+  const z = Math.max(.6, SIDE_CAM_Z + (lane-1.5)*LANE_W); // 2レーンの手前を基準にした奥行き
+  const f = Math.min(W*1.6, H*0.9), hz = H*0.40;
+  return {x: W/2 + f*(d-focus)/z, y: hz + f*(SIDE_CAM_H-y)/z, s: f/z};
+}
+function drawSide(){
+  // カメラは自分を追い、ゴールを過ぎたら少し先で止まる
+  const focus = Math.min(R.d + .6, 100.8);
+  R.focus = R.focus===undefined ? focus : R.focus + (focus-R.focus)*.25;
+  const fc = R.focus;
+  const hz = H*0.40;
+  // 空と観客席（向こう正面）
+  cx.fillStyle='#0b1b33'; cx.fillRect(0,0,W,H);
+  const st = sproj(0, LANES+2, 0, fc).y;
+  cx.fillStyle='#1d2433'; cx.fillRect(0, st-H*.16, W, H*.16);
+  for(let i=0;i<160;i++){
+    const xx = ((i*41.3 - fc*30) % W + W) % W, yy = st-H*.155 + (i*29%60)/60*H*.14;
+    cx.fillStyle=['#e2e8f0','#f87171','#fbbf24','#60a5fa','#a78bfa'][i%5]; cx.globalAlpha=.5; cx.fillRect(xx,yy,3,4);
+  }
+  cx.globalAlpha=1;
+  // 芝とトラック
+  cx.fillStyle='#1f5c33'; cx.fillRect(0, st, W, H-st);
+  const yNear = sproj(0,-.5,0,fc).y, yFar = sproj(0,LANES-.5,0,fc).y;
+  cx.fillStyle='#b5482f'; cx.fillRect(0, yFar, W, yNear-yFar);
+  cx.strokeStyle='rgba(255,255,255,.8)'; cx.lineWidth=1.5;
+  for(let l=0;l<=LANES;l++){ const y=sproj(0,l-.5,0,fc).y; cx.beginPath(); cx.moveTo(0,y); cx.lineTo(W,y); cx.stroke(); }
+  // 1m ごとの目印
+  for(let m=95;m<=105;m++){
+    if(m===100) continue;
+    const a=sproj(m,-.5,0,fc), b=sproj(m,LANES-.5,0,fc);
+    cx.strokeStyle='rgba(255,255,255,.12)'; cx.lineWidth=1; cx.beginPath(); cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y); cx.stroke();
+  }
+  // ゴール線
+  const g0=sproj(100,-.5,0,fc), g1=sproj(100,LANES-.5,0,fc), w0=g0.s*.05, w1=g1.s*.05;
+  cx.fillStyle='#fff'; cx.beginPath(); cx.moveTo(g0.x-w0,g0.y); cx.lineTo(g0.x+w0,g0.y); cx.lineTo(g1.x+w1,g1.y); cx.lineTo(g1.x-w1,g1.y); cx.fill();
+  // 奥のゴール柱
+  const p0=sproj(100,LANES,0,fc), p1=sproj(100,LANES,2.8,fc);
+  cx.strokeStyle='#ffd166'; cx.lineWidth=Math.max(2,p0.s*.06); cx.beginPath(); cx.moveTo(p0.x,p0.y); cx.lineTo(p1.x,p1.y); cx.stroke();
+  // 走者（奥のレーンから）
+  const list = R.ghosts.map(g=>({lane:g.lane, d:g.d, ghost:true, g}));
+  list.push({lane:R.lane, d:R.d, ghost:false});
+  list.sort((a,b)=>b.lane-a.lane);
+  list.forEach(o=>drawSideRunner(o, fc));
+  // ゴールの瞬間を「写真判定」として切り取っておく（号外の写真に使う）。自分の頭から足元まで
+  if(R.fin!==null && !R.photo){
+    const pb = sproj(R.d, R.lane, 0, fc);
+    const sy = Math.max(0, pb.y - pb.s*2.45), sh = Math.min(H, pb.y + pb.s*.35) - sy, ph=document.createElement('canvas');
+    ph.width=Math.round(W*DPR); ph.height=Math.round(sh*DPR);
+    ph.getContext('2d').drawImage(cv, 0, sy*DPR, W*DPR, sh*DPR, 0, 0, ph.width, ph.height);
+    R.photo = ph;
+    const m = R.ghosts.find(g=>g.main);
+    R.photoGap = 100 - ghostDist(m.rec.time, R.fin); // ゴールした瞬間のゴーストとの差（m）。負なら負け
+  }
+  // 画面の外にいるゴーストの位置
+  const main = R.ghosts.find(g=>g.main);
+  const mp = sproj(main.d, main.lane, 0, fc);
+  if(mp.x < -20 || mp.x > W+20){
+    const gap = main.d - R.d;
+    cx.fillStyle='#bae6fd'; cx.font='bold 14px sans-serif';
+    cx.textAlign = gap>0 ? 'right':'left';
+    cx.fillText(gap>0 ? `${main.rec.label} ${main.rec.time.toFixed(2)} は ${gap.toFixed(1)}m 先 ▶` : `◀ ${main.rec.label} ${main.rec.time.toFixed(2)} は ${(-gap).toFixed(1)}m 後ろ`, gap>0?W-10:10, yFar-10);
+  }
+  // 黒帯とスローの表示
+  const bar = H*.09;
+  cx.fillStyle='#000'; cx.fillRect(0,0,W,bar); cx.fillRect(0,H-bar,W,bar);
+  if(timeScale()<1){ cx.fillStyle='rgba(255,255,255,.85)'; cx.font='bold 13px sans-serif'; cx.textAlign='left'; cx.fillText('● SLOW', 12, H-bar+22); }
+  // ゴールの瞬間のフラッシュ
+  if(R.fin!==null && R.endT<.08){ cx.fillStyle=`rgba(255,255,255,${.7*(1-R.endT/.08)})`; cx.fillRect(0,0,W,H); }
+}
+function drawSideRunner(o, fc){
+  const base = sproj(o.d, o.lane, 0, fc), s = base.s;
+  if(base.x < -s*2 || base.x > W+s*2) return;
+  const ph = o.ghost ? o.g.d*1.35 : R.stepPhase;
+  const col = o.ghost ? '#7dd3fc' : '#ff6a3d', skin = o.ghost ? '#bae6fd' : '#f2c6a0', leg = o.ghost ? '#38bdf8' : '#1e293b';
+  const L = .47; // 太もも・すねの長さ
+  const fm = o.ghost ? {drive:0,fat:0,stride:1} : formOf(); // 自分は型ごとのフォーム（最高速＝ストライド、粘り不足＝のけぞり）
+  // 脚の角度（0 = 真下、+ = 前）。後ろに流れた脚はひざを強く曲げる
+  const legs = [0, Math.PI].map(off=>{
+    const sn = Math.sin(ph+off), a = sn*.75*fm.stride;
+    const bend = .25 + 1.3*Math.max(0, -Math.cos(ph+off)) * (sn<.3?1:.4);
+    const knee = {x: L*Math.sin(a), y: L*Math.cos(a)};
+    const foot = {x: knee.x + L*Math.sin(a-bend), y: knee.y + L*Math.cos(a-bend)};
+    return {knee, foot, back: off};
+  });
+  const low = Math.max(legs[0].foot.y, legs[1].foot.y);
+  const hip = {x: base.x, y: base.y - s*low};
+  const lean = .22 - .32*fm.fat; // 前傾。疲れると上体が起きてのけぞる
+  const sh = {x: hip.x + s*.5*Math.sin(lean), y: hip.y - s*.5*Math.cos(lean)};
+  const P2 = (o0,v)=>({x:o0.x+v.x*s, y:o0.y+v.y*s});
+  cx.save(); cx.globalAlpha = o.ghost ? .6 : 1; cx.lineCap='round'; cx.lineJoin='round';
+  const drawLeg = (lg, shade)=>{ const k=P2(hip,lg.knee), f=P2(hip,lg.foot);
+    cx.strokeStyle=shade; cx.lineWidth=Math.max(2,s*.11); cx.beginPath(); cx.moveTo(hip.x,hip.y); cx.lineTo(k.x,k.y); cx.lineTo(f.x,f.y); cx.stroke(); };
+  const drawArm = (k, shade)=>{ const a = -k*.9*(1+.7*fm.fat); // 脚と逆に振る。疲れると大振り
+    const el = {x: sh.x + s*.28*Math.sin(a), y: sh.y + s*.28*Math.cos(a)};
+    const fa = a + 1.5; const hd = {x: el.x + s*.26*Math.sin(fa), y: el.y + s*.26*Math.cos(fa)};
+    cx.strokeStyle=shade; cx.lineWidth=Math.max(2,s*.08); cx.beginPath(); cx.moveTo(sh.x,sh.y); cx.lineTo(el.x,el.y); cx.lineTo(hd.x,hd.y); cx.stroke(); };
+  // 向こう側の手足（暗め）→ 胴 → 手前の手足
+  drawLeg(legs[1], o.ghost?'#0e7490':'#0f172a'); drawArm(Math.sin(ph+Math.PI), o.ghost?'#7dd3fc':'#c9a07f');
+  cx.strokeStyle=col; cx.lineWidth=Math.max(3,s*.2); cx.beginPath(); cx.moveTo(hip.x,hip.y); cx.lineTo(sh.x,sh.y); cx.stroke();
+  cx.fillStyle = o.ghost ? '#e0f2fe' : '#2b1d14';
+  cx.beginPath(); cx.arc(sh.x + s*(.07-.05*fm.fat), sh.y - s*.17, s*.11, 0, Math.PI*2); cx.fill();
+  drawLeg(legs[0], leg); drawArm(Math.sin(ph), skin);
+  cx.restore();
+  // ラベル
+  const lb = sproj(o.d, o.lane, 2.15, fc);
+  cx.font = `bold ${Math.max(11,Math.min(15,s*.14))}px sans-serif`; cx.textAlign='center';
+  cx.fillStyle = o.ghost ? (o.g.main ? '#e0f2fe' : 'rgba(224,242,254,.6)') : '#ffb199';
+  cx.fillText(o.ghost ? `${o.g.rec.label} ${o.g.rec.time.toFixed(2)}` : displayName(), lb.x, lb.y);
+}
+
+// ===== 結果
+let lastResult = null;
+function showResult(){
+  const rec = R.rec, t = R.fin, won = t < rec.time;
+  crowdStop(won ? 2.5 : .8);
+  const prevBest = save.best[rec.id];
+  if(!prevBest || t<prevBest) save.best[rec.id]=t;
+  if(won) save.wins[rec.id]=true;
+  { const i = RECORDS.findIndex(r=>r.id===rec.id); // 次に開いたとき、続きから挑む記録
+    save.target = won && i+1<RECORDS.length ? RECORDS[i+1].id : rec.id; }
+  persist();
+  lastResult = {rec, t, won, react:R.react, topV:R.topV, stumbles:R.stumbles, falseStart:R.falseStart, runner:{...runner}};
+  $('resTime').textContent = t.toFixed(2);
+  const diff = t - rec.time;
+  $('resVerdict').className = 'verdict ' + (won?'win':'lose');
+  $('resVerdict').textContent = won ? `${rec.label}の世界記録を ${Math.abs(diff).toFixed(2)} 秒 書き換えた！` : `${rec.label}の記録まで あと ${diff.toFixed(2)} 秒`;
+  $('resStats').innerHTML = [
+    ['反応', R.react!==null ? R.react.toFixed(3)+'秒' : '-'],
+    ['最高速', (R.topV*3.6).toFixed(1)+'km/h'],
+    ['つまずき', R.stumbles+'回'],
+  ].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  lastResult.photo = R.photo; lastResult.photoGap = R.photoGap;
+  const idx = RECORDS.findIndex(r=>r.id===rec.id);
+  const hasNext = won && idx+1<RECORDS.length;
+  $('nextBtn').style.display = hasNext ? 'block' : 'none';
+  $('nameBox').style.display = won && save.name ? 'flex' : 'none';
+  $('resHist').innerHTML=''; $('paperWrap').classList.remove('on'); $('paperBtn').style.display='none';
+  $('result').scrollTop = 0;
+  show('result');
+  // 初めて歴史を変えたときは、記録表に刻む名前を先に決めてもらう
+  if(won && !save.name){
+    $('nameFirst').value = sharedName();
+    $('nameModal').classList.add('on');
+    setTimeout(()=>{ try{ $('nameFirst').focus(); }catch(e){} }, 300);
+  } else renderRewrite();
+}
+function displayName(){ return save.name || 'あなた'; }
+function sharedName(){ try{ return localStorage.getItem('indieshorts_player_name') || ''; }catch(e){ return ''; } }
+function cleanName(s){ return (s||'').replace(/[\u0000-\u001f<>]/g,'').trim().slice(0,12); }
+function setName(n){
+  save.name = n; persist();
+  try{ localStorage.setItem('indieshorts_player_name', n); }catch(e){} // Sort 9・Lucky Pull と共通の名前
+}
+function esc(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// 記録表への割り込みと、号外／写真判定
+function renderRewrite(){
+  const r = lastResult, rec = r.rec, won = r.won;
+  if(won && save.name){ $('nameInput').value = save.name; $('nameBox').style.display='flex'; }
+  // 記録表に割り込む（勝ったら古い記録に線が引かれ、自分のタイムが刷り込まれる）
+  const rows = RECORDS.map(x=>({label:x.label, time:x.time, cls: won && x.id===rec.id ? 'rewrite' : ''}));
+  const idx = RECORDS.findIndex(x=>x.id===rec.id);
+  rows.splice(idx+1,0,{label:`${rec.label}（<span class="nm">${esc(displayName())}</span>）`, time:r.t, cls: won ? 'me stamp' : 'me', isNew:won});
+  const lo = Math.max(0, idx-2), hi = Math.min(rows.length, idx+5);
+  $('resHist').innerHTML = `<h3>${won?'書き換わった記録表':'記録表'}（${rec.label}の前後）</h3>` +
+    rows.slice(lo,hi).map(x=>`<div class="h ${x.cls}"><span>${x.label}${x.isNew?'<span class="new">NEW</span>':''}</span><span>${x.time.toFixed(2)}</span></div>`).join('');
+  // 号外（勝ち）／写真判定（負け）
+  const wrap = $('paperWrap'); wrap.classList.remove('on'); void wrap.offsetWidth;
+  if(r.photo){
+    drawPaperImage();
+    $('paperLb').textContent = won ? '号外が出ました' : '写真判定';
+    $('paperBtn').textContent = won ? '号外を画像で保存' : '写真を画像で保存';
+    wrap.classList.toggle('quick', !won); wrap.classList.add('on'); $('paperBtn').style.display='block';
+  }
+  if(won){ setTimeout(stampSound, 1150); setTimeout(paperSound, 1900); }
+}
+function drawPaperImage(){
+  const r = lastResult; if(!r || !r.photo) return;
+  const pc = r.won ? makePaper(r, r.photo, r.photoGap) : makePhotoCard(r, r.photo, r.photoGap);
+  r.paper = pc; $('paperImg').src = pc.toDataURL('image/png');
+}
+// 初回の名前決め
+$('nameFirstBtn').onclick = ()=>{
+  const n = cleanName($('nameFirst').value);
+  if(!n){ $('nameFirst').focus(); $('nameFirstMsg').textContent='名前を1文字以上入れてください'; return; }
+  setName(n); $('nameModal').classList.remove('on'); renderRewrite();
+};
+$('nameFirst').addEventListener('keydown', e=>{ if(e.key==='Enter') $('nameFirstBtn').click(); });
+// 2回目以降: 入っている名前を変えたいときだけ書き換える
+function applyNameChange(){
+  const n = cleanName($('nameInput').value);
+  if(!n){ $('nameInput').value = save.name || ''; return; }
+  if(n===save.name) return;
+  setName(n);
+  document.querySelectorAll('#resHist .nm').forEach(el=>el.textContent=n);
+  drawPaperImage();
+  $('nameSaved').textContent='変更しました'; setTimeout(()=>$('nameSaved').textContent='', 1500);
+}
+$('nameSave').onclick = applyNameChange;
+$('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.target.blur(); applyNameChange(); } });
+
+// ===== 号外の紙面（canvas で描いて画像にする）
+const SERIF = '"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif';
+const SANS = '"Hiragino Sans","Noto Sans JP","Yu Gothic UI",sans-serif';
+function drawPhoto(c, photo, x, y, w, h){
+  // 写真は中央を切り取り、白黒で新聞っぽく
+  const r = photo.width/photo.height, rr = w/h;
+  let sw=photo.width, sh=photo.height, sx=0, sy=0;
+  if(r>rr){ sw=sh*rr; sx=(photo.width-sw)/2; } else { sh=sw/rr; sy=(photo.height-sh)/2; }
+  c.save(); c.filter='grayscale(1) contrast(1.25) brightness(1.05)';
+  c.drawImage(photo, sx, sy, sw, sh, x, y, w, h); c.restore();
+  // 網点っぽいざらつき
+  c.save(); c.globalAlpha=.08; c.fillStyle='#000';
+  for(let i=0;i<1800;i++){ c.fillRect(x+Math.random()*w, y+Math.random()*h, 1.5, 1.5); }
+  c.restore();
+  c.strokeStyle='#222'; c.lineWidth=2; c.strokeRect(x,y,w,h);
+}
+function gapText(gap){ // m を「胸の差」などのことばに
+  const a=Math.abs(gap);
+  if(a<.15) return '胸ひとつの差'; if(a<.5) return '半身の差'; if(a<1.2) return '一歩の差';
+  return `${a.toFixed(1)}m の差`;
+}
+function makePaper(r, photo, gap){
+  // 写真の枠の高さは写真の縦横比に合わせる（スマホの縦画面だと縦長になる）
+  const phH = Math.round(Math.max(300, Math.min(560, (720-72)*photo.height/photo.width))), dy = phH-330;
+  const W2=720, H2=1000+dy, c0=document.createElement('canvas'); c0.width=W2; c0.height=H2;
+  const c=c0.getContext('2d');
+  c.fillStyle='#f1ead6'; c.fillRect(0,0,W2,H2);
+  c.fillStyle='#1d1d1d'; c.strokeStyle='#1d1d1d';
+  // 題字
+  c.textAlign='left'; c.textBaseline='alphabetic';
+  c.font=`900 64px ${SERIF}`; c.fillText('時空スポーツ', 36, 92);
+  c.fillStyle='#c0262d'; c.fillRect(W2-176, 34, 140, 70);
+  c.fillStyle='#f1ead6'; c.font=`900 50px ${SERIF}`; c.textAlign='center'; c.fillText('号外', W2-106, 88);
+  c.fillStyle='#1d1d1d'; c.textAlign='left'; c.font=`500 18px ${SANS}`;
+  c.fillText(`${r.rec.label}　書き換えられた歴史面`, 38, 128);
+  c.lineWidth=4; c.beginPath(); c.moveTo(30,144); c.lineTo(W2-30,144); c.stroke();
+  c.lineWidth=1; c.beginPath(); c.moveTo(30,151); c.lineTo(W2-30,151); c.stroke();
+  // 見出し
+  c.font=`800 34px ${SERIF}`; c.fillText('男子100m 世界記録', 38, 206);
+  c.font=`900 150px ${SERIF}`; c.fillText(r.t.toFixed(2), 30, 350);
+  const tw = c.measureText(r.t.toFixed(2)).width;
+  c.font=`900 56px ${SERIF}`; c.fillText('秒', 30+tw+8, 350);
+  c.fillStyle='#c0262d'; c.font=`800 30px ${SERIF}`;
+  c.fillText(`${r.rec.time.toFixed(2)} を ${(r.rec.time-r.t).toFixed(2)} 秒 更新`, 38, 400);
+  // 走者の名前を縦書きの見出しで右側に
+  const nm = displayName(), chars=[...nm], top=172, room=232;
+  const fs = Math.min(54, Math.floor(room/chars.length));
+  c.fillStyle='#1d1d1d'; c.font=`900 ${fs}px ${SERIF}`; c.textAlign='center'; c.textBaseline='top';
+  chars.forEach((ch,i)=>c.fillText(ch, W2-70, top+i*fs));
+  c.lineWidth=2; c.beginPath(); c.moveTo(W2-116, top-6); c.lineTo(W2-116, top+room+6); c.stroke();
+  c.textAlign='left'; c.textBaseline='alphabetic';
+  // 写真
+  c.fillStyle='#1d1d1d';
+  drawPhoto(c, photo, 36, 428, W2-72, phH);
+  c.font=`500 17px ${SANS}`;
+  c.fillText(`▲ゴールの瞬間。${r.rec.label}の記録に${gapText(gap)}をつけた`, 38, 786+dy);
+  // 本文
+  const g=r.runner;
+  c.lineWidth=1; c.beginPath(); c.moveTo(30,810+dy); c.lineTo(W2-30,810+dy); c.stroke();
+  c.font=`500 20px ${SERIF}`;
+  const body = [
+    `号砲から${r.react!=null?r.react.toFixed(3):'-'}秒で飛び出した${runnerType(r.runner).name}の${displayName()}が、`,
+    `最高時速${(r.topV*3.6).toFixed(1)}キロでゴールを駆け抜けた。`,
+    `素質はスタート${g.start}・加速${g.accel}・最高速${g.top}・粘り${g.stam}。記録表は今日から書き換わる。`,
+  ];
+  let by = 846+dy;
+  body.forEach(s=>{ by = wrapText(c, s, 38, by, W2-76, 30) + 34; });
+  c.font=`500 15px ${SANS}`; c.fillStyle='#555'; c.textAlign='right';
+  c.fillText('Rewrite 100 ｜ n0tya.github.io/rewrite100', W2-36, H2-24);
+  return c0;
+}
+function makePhotoCard(r, photo, gap){
+  const phH = Math.round(Math.max(300, Math.min(560, (720-40)*photo.height/photo.width)));
+  const W2=720, H2=phH+120, c0=document.createElement('canvas'); c0.width=W2; c0.height=H2;
+  const c=c0.getContext('2d');
+  c.fillStyle='#111'; c.fillRect(0,0,W2,H2);
+  drawPhoto(c, photo, 20, 20, W2-40, phH);
+  c.fillStyle='#eee'; c.font=`800 28px ${SANS}`; c.textAlign='left';
+  c.fillText(`写真判定　${r.t.toFixed(2)}`, 26, phH+64);
+  c.fillStyle='#9aa7b8'; c.font=`500 18px ${SANS}`;
+  c.fillText(`${r.rec.label}の ${r.rec.time.toFixed(2)} に${gapText(gap)}で届かず`, 26, phH+98);
+  return c0;
+}
+function wrapText(c, s, x, y, maxW, lh){
+  let line='', yy=y;
+  for(const ch of s){ if(c.measureText(line+ch).width>maxW){ c.fillText(line,x,yy); line=ch; yy+=lh; } else line+=ch; }
+  if(line) c.fillText(line,x,yy);
+  return yy;
+}
+$('paperBtn').onclick = async ()=>{
+  const r=lastResult; if(!r || !r.paper) return;
+  const name = r.won ? `gougai-${r.rec.id}.png` : `photo-${r.rec.id}.png`;
+  const blob = await new Promise(res=>r.paper.toBlob(res,'image/png'));
+  try{
+    const file = new File([blob], name, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file]}); return; }
+  }catch(e){ if(e && e.name==='AbortError') return; }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+};
+$('nextBtn').onclick = ()=>{ targetIdx = Math.min(RECORDS.length-1, targetIdx+1); runner=null; openSlot(); };
+$('retryBtn').onclick = ()=> startRace();
+$('reslotBtn').onclick = ()=> openSlot();
+$('toTitleBtn').onclick = ()=>{ crowdStop(.3); R=null; renderTitle(); show('title'); };
+$('shareBtn').onclick = ()=>{
+  const r = lastResult; if(!r) return;
+  const g = r.runner, ranks = `${runnerType(g).name}・スタート${g.start}・加速${g.accel}・最高速${g.top}・粘り${g.stam}`;
+  const text = r.won
+    ? `${save.name ? save.name+'、' : ''}${r.rec.label}の100m世界記録 ${r.rec.time.toFixed(2)} を ${r.t.toFixed(2)} で破って歴史を書き換えた！（${ranks}）`
+    : `${r.rec.label}の100m世界記録 ${r.rec.time.toFixed(2)} に挑んで ${r.t.toFixed(2)}。あと${(r.t-r.rec.time).toFixed(2)}秒…（${ranks}）`;
+  const url = 'https://x.com/intent/post?text=' + encodeURIComponent(`${text}\n#${GAME_NAME}\n`) + '&url=' + encodeURIComponent(SHARE_URL);
+  window.open(url, '_blank', 'noopener');
+};
+
+// ===== 音（WebAudio、シンプル）
+let ac=null;
+function audio(){ if(!ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return ac; }
+// 音の出口を2本に分けて、効果音と歓声の音量を別々に変えられるようにする
+let seBus=null, crowdBus=null;
+function bus(v){ const a=audio(); if(!a) return null; const g=a.createGain(); g.gain.value=v; g.connect(a.destination); return g; }
+function seOut(){ if(!seBus) seBus=bus(settings.se); return seBus; }
+function crowdOut(){ if(!crowdBus) crowdBus=bus(paused?0:settings.crowd); return crowdBus; }
+function beep(freq, dur, type='sine', vol=.15){
+  const a=audio(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(vol,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dur);
+  o.connect(g).connect(seOut()); o.start(); o.stop(a.currentTime+dur);
+}
+function gun(){
+  const a=audio(); if(!a) return;
+  const len=a.sampleRate*.25, buf=a.createBuffer(1,len,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,4);
+  const s=a.createBufferSource(), g=a.createGain(); g.gain.value=.5; s.buffer=buf; s.connect(g).connect(seOut()); s.start();
+}
+function slowSound(){ // 音が低く伸びる「ヴォン」
+  const a=audio(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(); o.type='sawtooth';
+  o.frequency.setValueAtTime(220,a.currentTime); o.frequency.exponentialRampToValueAtTime(55,a.currentTime+.6);
+  g.gain.setValueAtTime(.08,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.7);
+  o.connect(g).connect(seOut()); o.start(); o.stop(a.currentTime+.7);
+}
+// ===== 歓声（録音: sounds/crowd.mp3 スタジアムのざわめき）
+// 同じ録音を2本、ずらして重ねる。1本目はいつも流し、2本目はゴールに近づくほど足して人数が増えたように聞かせる。
+// 高い音を持ち上げると声が張って聞こえるので、盛り上がりに合わせて高域を上げる。スロー中は高域を切ってこもらせる。
+// ゴールした瞬間は、勝ち＝sounds/cheer-win.mp3（スタジアムの歓声1）、負け＝sounds/cheer-lose.mp3（スタジアムの歓声2）を1回流す
+const CROWD_URL = 'sounds/crowd.mp3', CHEER_URLS = {win:'sounds/cheer-win.mp3', lose:'sounds/cheer-lose.mp3'};
+let crowdRec = null, crowdReady = null;
+const cheerRec = {};
+function loadSound(url){
+  const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  return fetch(url).then(r=>{ if(!r.ok) throw new Error(url+' '+r.status); return r.arrayBuffer(); })
+    .then(ab=>new Promise((res,rej)=>new OC(2,1,44100).decodeAudioData(ab,res,rej)));
+}
+function prepareCrowd(){
+  if(crowdReady) return crowdReady;
+  crowdReady = Promise.all([
+    loadSound(CROWD_URL).then(buf=>{ crowdRec = makeLoop(buf, .8); if(R && R.phase!=='done' && !crowd) crowdStart(); }),
+    ...Object.entries(CHEER_URLS).map(([k,u])=>loadSound(u).then(buf=>{ cheerRec[k]=buf; })),
+  ]).catch(e=>console.warn('歓声を読み込めませんでした', e));
+  return crowdReady;
+}
+function playFinishCheer(won){
+  const a=audio(), buf=cheerRec[won?'win':'lose']; if(!a || !buf) return;
+  // 背景のざわめきとは別の道で鳴らし、結果画面に移っても最後まで流す。スロー中はこもらせる
+  const s=a.createBufferSource(), lp=a.createBiquadFilter(), g=a.createGain();
+  s.buffer=buf; lp.type='lowpass'; lp.frequency.value = crowd && crowd.cut>0 ? crowd.cut : 12000; g.gain.value=won?1:.9;
+  s.connect(lp).connect(g).connect(crowdOut()); s.start();
+  if(crowd) crowd.shotLp = lp;
+}
+function makeLoop(buf, fadeSec){ // 末尾を頭に重ねて、ループの継ぎ目を目立たなくする
+  const sr=buf.sampleRate, fade=Math.min(Math.round(sr*fadeSec), Math.floor(buf.length/3)), len=buf.length-fade;
+  const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const out = new OC(2,1,sr).createBuffer(2, len, sr);
+  for(let ch=0; ch<2; ch++){
+    const src=buf.getChannelData(Math.min(ch, buf.numberOfChannels-1)), dst=out.getChannelData(ch);
+    for(let i=0;i<len;i++){ let x=src[i]; if(i<fade){ const w=i/fade; x = x*Math.sqrt(w) + src[len+i]*Math.sqrt(1-w); } dst[i]=x; }
+  }
+  return out;
+}
+let crowd=null;
+function crowdStart(){
+  const a=audio(); if(!a || crowd) return;
+  if(!crowdRec){ prepareCrowd(); return; }
+  const shelf=a.createBiquadFilter(); shelf.type='highshelf'; shelf.frequency.value=2200; shelf.gain.value=0;
+  const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=12000;
+  const master=a.createGain(); master.gain.value=.8;
+  shelf.connect(lp).connect(master).connect(crowdOut());
+  const mk = (offset, rate)=>{ const s=a.createBufferSource(); s.buffer=crowdRec; s.loop=true; s.playbackRate.value=rate;
+    const g=a.createGain(); g.gain.value=0; s.connect(g).connect(shelf); s.start(0, offset % crowdRec.duration); return {s,g,level:-1}; };
+  const off = Math.random()*crowdRec.duration;
+  crowd={shelf, lp, master, a:mk(off,1), b:mk(off+crowdRec.duration/2, 1.04), cut:-1, boost:-99};
+}
+function setLayer(L, level){
+  if(Math.abs(level-L.level)<.01) return;
+  const a=audio(); L.g.gain.setTargetAtTime(level, a.currentTime, .25); L.level=level;
+}
+function crowdStop(fade=.6){
+  if(!crowd) return; const a=audio(), c=crowd; crowd=null;
+  c.master.gain.cancelScheduledValues(a.currentTime); c.master.gain.setTargetAtTime(0, a.currentTime, fade/3);
+  [c.a,c.b].forEach(L=>L.s.stop(a.currentTime+fade+.5));
+}
+function crowdUpdate(){
+  if(!R || !crowd) return;
+  const a=audio(), muffled = R.side && timeScale()<.6; // スロー中はこもった音に
+  const p = Math.min(1, R.d/100);
+  let la, lb, boost;
+  if(R.phase==='marks'){ la=.5; lb=0; boost=0; }
+  else if(R.phase==='set'){ la=.1; lb=0; boost=0; }                        // 「用意」で静まる
+  else if(R.phase==='run'){ la=.5+.35*p; lb=.8*Math.pow(p,1.3); boost=7*p; } // ゴールに近づくほど人数が増えて声が張る
+  else {                                                                      // ゴール後は録音の歓声が主役。ざわめきは下げる
+    const won = R.fin < R.rec.time;
+    if(!crowd.finished){ crowd.finished=true; playFinishCheer(won); }
+    if(won){ la=.6; lb=.4; boost=6; } else { la=.4; lb=0; boost=0; }
+  }
+  setLayer(crowd.a, la); setLayer(crowd.b, lb);
+  if(Math.abs(boost-crowd.boost)>.2){ crowd.shelf.gain.setTargetAtTime(boost, a.currentTime, .2); crowd.boost=boost; }
+  const cut = muffled ? 650 : 12000;
+  if(cut!==crowd.cut){
+    crowd.lp.frequency.setTargetAtTime(cut, a.currentTime, .12);
+    if(crowd.shotLp) crowd.shotLp.frequency.setTargetAtTime(cut, a.currentTime, .12);
+    crowd.cut=cut;
+  }
+}
+function stampSound(){ beep(140,.12,'square',.14); setTimeout(()=>beep(880,.12,'triangle',.08),60); }
+function paperSound(){ // 紙がめくれるようなノイズ
+  const a=audio(); if(!a) return;
+  const len=a.sampleRate*.35, buf=a.createBuffer(1,len,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/len)*.6;
+  const s=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
+  f.type='highpass'; f.frequency.value=1800; g.gain.value=.25; s.buffer=buf; s.connect(f).connect(g).connect(seOut()); s.start();
+}
+function step(){ beep(90+Math.random()*30,.05,'triangle',.12); }
+function finishSound(win){ if(win){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'square',.08),i*90)); } else beep(330,.3,'triangle',.1); }
+document.addEventListener('pointerdown', ()=>{ const a=audio(); if(a && a.state==='suspended') a.resume(); }, {once:false});
+
+// テスト用（バランス調整のシミュレーション）
+window.__sim = function(grades, tapsPerSec, react=.18){
+  const st = grades; let t=0,d=0,v=0; const dt=1/120; let top=0;
+  while(d<100 && t<20){
+    t+=dt; if(t<react) continue;
+    let vTop=P.top[st.top]; if(t>5.5) vTop*=(1-P.stam[st.stam]*(t-5.5));
+    const want=Math.min(vTop, tapsPerSec*P.stride);
+    const boost = t-react<1.2 ? P.start[st.start] : 1;
+    if(want>v) v+=(want-v)*P.accel[st.accel]*boost*dt; else v+=(want-v)*.9*dt;
+    d+=v*dt; top=Math.max(top,v);
+  }
+  return +t.toFixed(2);
+};
+
+renderTitle();
+prepareCrowd();
+</script>
+</body>
+</html>
